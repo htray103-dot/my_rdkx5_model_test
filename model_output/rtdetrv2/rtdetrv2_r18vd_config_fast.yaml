@@ -1,0 +1,31 @@
+# 快速版转换配置：24 张校准图 + max 校准（不做迭代阈值搜索）
+# 用途：先拿到可部署的 .bin 验证链路；精度调优再用完整 128 张 + default 校准重跑
+model_parameters:
+  onnx_model: '/open_explorer/_project/DETR/rtdetr/rtdetrv2_r18vd_120e_coco_rdk.onnx'
+  march: 'bayes-e'
+  layer_out_dump: False
+  working_dir: '/open_explorer/_project/DETR/rtdetr/model_output_fast'
+  output_model_file_prefix: 'rtdetrv2_r18vd_640x640_rgb'
+
+input_parameters:
+  input_name: 'images'
+  input_type_rt: 'rgb'
+  input_layout_rt: 'NCHW'
+  input_type_train: 'rgb'
+  input_layout_train: 'NCHW'
+  input_shape: '1x3x640x640'
+  norm_type: 'data_mean_and_scale'
+  mean_value: '0 0 0'
+  scale_value: '0.003921568627451 0.003921568627451 0.003921568627451'
+
+calibration_parameters:
+  cal_data_dir: '/open_explorer/_project/DETR/rtdetr/cal24'
+  cal_data_type: 'float32'
+  preprocess_on: True
+  calibration_type: 'max'               # max 校准：快、确定性强
+  max_percentile: 0.99996
+
+compiler_parameters:
+  compile_mode: 'latency'
+  debug: True
+  optimize_level: 'O3'
